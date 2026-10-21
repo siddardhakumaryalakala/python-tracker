@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Python 30-Day Mastery Tracker & Daily Push Notification Hub" />
+  <title>Python 30-Day Mastery Tracker & Push Hub</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #070d19;
+      --bg-card: #0f172a;
+      --bg-card-hover: #162238;
+      --bg-surface: #1e293b;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-focus: #38bdf8;
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --py-blue: #38bdf8;
+      --py-blue-glow: rgba(56, 189, 248, 0.25);
+      --py-yellow: #facc15;
+      --py-yellow-glow: rgba(250, 204, 21, 0.2);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --purple: #a855f7;
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+      --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.06) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 24px 20px 80px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    /* Top Status Bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      font-size: 0.82rem;
+    }
+
+    .server-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+      box-shadow: 0 0 10px var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .topic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+    }
+
+    .topic-badge a {
+      color: var(--py-blue);
+      text-decoration: none;
+      font-family: 'Fira Code', monospace;
+      font-weight: 500;
+    }
+
+    .topic-badge a:hover {
+      text-decoration: underline;
+    }
+
+    /* Hero Header */
+    header {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -80px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .title-group h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #38bdf8 0%, #facc15 60%, #38bdf8 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shine 8s linear infinite;
+    }
+
+    @keyframes shine {
+      to { background-position: 200% center; }
+    }
+
+    .title-group p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
+
+    .actions-bar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+      transition: var(--transition-smooth);
+    }
+
+    .btn:hover {
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      box-shadow: none;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: #334155;
+      border-color: #475569;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
+    }
+
+    .btn-accent:hover {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    }
+
+    /* 1-Hour Protocol Grid */
+    .protocol-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .protocol-step {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 12px 16px;
+      border-left: 3px solid var(--py-blue);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      transition: var(--transition-smooth);
+    }
+
+    .protocol-step:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .protocol-time {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--py-yellow);
+    }
+
+    .protocol-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .protocol-desc {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    /* Progress Stats Row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: 1fr; }
+    }
+
+    .stat-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .progress-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .progress-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--py-blue);
+    }
+
+    .progress-bar-track {
+      height: 12px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8 0%, #10b981 100%);
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 14px var(--py-blue-glow);
+    }
+
+    .stat-number {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #fff;
+      margin-top: 4px;
+    }
+
+    .stat-meta {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* Filters Bar */
+    .filters-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    .filter-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .filter-tab.active, .filter-tab:hover {
+      background: var(--bg-surface);
+      color: #fff;
+    }
+
+    .filter-tab.active {
+      color: var(--py-blue);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Modules & Grid */
+    .module-group {
+      margin-bottom: 36px;
+    }
+
+    .module-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .module-tag {
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .module-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .module-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+    }
+
+    /* Day Card */
+    .day-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: var(--transition-smooth);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .day-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .day-card.completed {
+      background: rgba(16, 185, 129, 0.04);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .day-card.today-highlight {
+      border-color: var(--py-blue);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+    }
+
+    .day-card.today-highlight::after {
+      content: "TODAY'S TARGET";
+      position: absolute;
+      top: -10px;
+      right: 18px;
+      background: linear-gradient(90deg, #0284c7, #38bdf8);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      box-shadow: 0 2px 8px rgba(56, 189, 248, 0.5);
+    }
+
+    .day-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .day-pill {
+      background: #1e293b;
+      color: var(--py-blue);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .day-card.completed .day-pill {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .check-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      user-select: none;
+    }
+
+    .check-btn input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--success);
+      cursor: pointer;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .day-card.completed .card-title {
+      color: #cbd5e1;
+    }
+
+    .topic-list {
+      list-style-type: none;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .topic-list li {
+      position: relative;
+      padding-left: 14px;
+      line-height: 1.4;
+    }
+
+    .topic-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--py-yellow);
+      font-weight: bold;
+    }
+
+    /* Code Box */
+    .code-box {
+      background: #090e17;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      position: relative;
+    }
+
+    .code-box pre {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: #7dd3fc;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.4;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    /* Modal Timer */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      animation: modalIn 0.25s ease-out;
+    }
+
+    @keyframes modalIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .timer-clock {
+      font-family: 'Fira Code', monospace;
+      font-size: 3.8rem;
+      font-weight: 700;
+      color: var(--py-yellow);
+      letter-spacing: -0.02em;
+      margin: 16px 0;
+      text-shadow: 0 0 25px var(--py-yellow-glow);
+    }
+
+    .phase-badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--py-blue);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .timer-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    /* Settings Modal */
+    .form-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    .form-input:focus {
+      border-color: var(--py-blue);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+
+    /* Toast System */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 2000;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      background: #1e293b;
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 380px;
+    }
+
+    .toast-success { border-left: 4px solid var(--success); }
+    .toast-error { border-left: 4px solid #ef4444; }
+    .toast-info { border-left: 4px solid var(--py-blue); }
+
+    @keyframes toastIn {
+      from { transform: translateX(50px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Top Status Bar -->
+    <div class="status-bar">
+      <div class="server-status" id="server-status-pill">
+        <span class="pulse-dot" id="server-dot"></span>
+        <span id="server-status-text">Connecting to Python Backend...</span>
+      </div>
+
+      <div class="topic-badge" id="alert-time-badge" style="cursor: pointer;" title="Click to customize daily alert time">
+        <span>⏰ Alert Time:</span>
+        <strong id="alert-time-display" style="color:var(--py-yellow); font-family:'Fira Code',monospace;">09:00 AM</strong>
+      </div>
+
+      <div class="topic-badge">
+        <span>Push Topic:</span>
+        <a id="topic-link" href="https://ntfy.sh/python-tracker" target="_blank" rel="noopener">python-tracker</a>
+      </div>
+    </div>
+
+    <!-- Main Header -->
+    <header>
+      <div class="header-main">
+        <div class="title-group">
+          <h1>Python 30-Day Mastery Tracker</h1>
+          <p id="header-subtitle">1 Hour Daily Protocol • Core to Capstone • Automated Push Reminders</p>
+        </div>
+
+        <div class="actions-bar">
+          <button class="btn btn-accent" id="btn-trigger-push" title="Send today's study roadmap directly to your phone">
+            ⚡ Send Push to Phone
+          </button>
+          <button class="btn" id="btn-open-timer" title="Launch the 1-Hour Phase Study Timer">
+            ⏱ Study Timer
+          </button>
+          <button class="btn btn-secondary" id="btn-open-settings" title="Configure ntfy topic, start date, and alert schedule">
+            ⚙ Settings
+          </button>
+        </div>
+      </div>
+
+      <!-- 1-Hour Study Protocol Banner -->
+      <div class="protocol-strip">
+        <div class="protocol-step">
+          <span class="protocol-time">15 Minutes</span>
+          <span class="protocol-label">1. Learn Concept</span>
+          <span class="protocol-desc">Read docs, tutorials & mental models</span>
+        </div>
+        <div class="protocol-step">
+          <span class="protocol-time">25 Minutes</span>
+          <span class="protocol-label">2. Code Yourself</span>
+          <span class="protocol-desc">Type code hands-on in VS Code</span>
+        </div>
+        <div class="protocol-step">
+          <span class="protocol-time">15 Minutes</span>
+          <span class="protocol-label">3. Solve Problems</span>
+          <span class="protocol-desc">Tackle edge cases & mini challenges</span>
+        </div>
+        <div class="protocol-step">
+          <span class="protocol-time">5 Minutes</span>
+          <span class="protocol-label">4. Notes & Review</span>
+          <span class="protocol-desc">Log key learnings & commit code</span>
+        </div>
+      </div>
+
+      <!-- Progress Strip -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="progress-header">
+            <span class="progress-title">Overall Roadmap Progress</span>
+            <span class="progress-val" id="progress-val">0%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="progress-title">Days Completed</span>
+          <div class="stat-number" id="stat-completed-count">0 / 30</div>
+          <div class="stat-meta" id="stat-remaining-count">30 days remaining</div>
+        </div>
+
+        <div class="stat-card">
+          <span class="progress-title">Today's Target</span>
+          <div class="stat-number" id="stat-today-badge">Day 1</div>
+          <div class="stat-meta" id="stat-today-title">Setup + Basics</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Filter Bar -->
+    <div class="filters-bar">
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All Days (30)</button>
+        <button class="filter-tab" data-filter="today">Today's Focus</button>
+        <button class="filter-tab" data-filter="pending">Pending</button>
+        <button class="filter-tab" data-filter="completed">Completed</button>
+      </div>
+
+      <div style="font-size:0.82rem; color:var(--text-muted);" id="filter-count-label">
+        Showing all 30 days
+      </div>
+    </div>
+
+    <!-- Roadmap Dynamic Container -->
+    <main id="roadmap-container"></main>
+  </div>
+
+  <!-- Study Timer Modal -->
+  <div class="modal-backdrop" id="timer-modal">
+    <div class="modal-box">
+      <h3 style="font-size: 1.3rem; margin-bottom: 4px;">1-Hour Study Session</h3>
+      <div class="phase-badge" id="timer-phase-badge">Phase 1: Learn Concept</div>
+      <div class="timer-clock" id="timer-display">15:00</div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 16px;" id="timer-tip">
+        Focus deeply without distractions. Understand the core syntax and behavior.
+      </p>
+
+      <div class="timer-controls">
+        <button class="btn" id="timer-play-btn">Start</button>
+        <button class="btn btn-secondary" id="timer-skip-btn">Skip Phase</button>
+        <button class="btn btn-secondary" id="timer-reset-btn">Reset</button>
+        <button class="btn btn-secondary" id="timer-close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal-box" style="text-align: left;">
+      <h3 style="font-size: 1.3rem; margin-bottom: 6px;">Settings & Automation</h3>
+      <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 20px;">
+        Configure push notification parameters and daily background alerts.
+      </p>
+
+      <div class="form-group">
+        <label for="input-topic">ntfy Push Topic Name</label>
+        <input type="text" id="input-topic" class="form-input" placeholder="e.g. python-tracker" />
+        <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:4px;">
+          Subscribe to this exact topic in your free ntfy phone app or at <a href="https://ntfy.sh" target="_blank" style="color:var(--py-blue);">ntfy.sh</a>.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="input-start-date">Challenge Start Date (Day 1)</label>
+        <input type="date" id="input-start-date" class="form-input" />
+      </div>
+
+      <div class="form-group">
+        <label for="input-reminder-time">Daily Alert Time (Auto-Scheduler)</label>
+        <input type="time" id="input-reminder-time" class="form-input" />
+      </div>
+
+      <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" id="input-auto-remind" style="accent-color: var(--success); width:18px; height:18px;" />
+        <label for="input-auto-remind" style="margin-bottom:0; cursor:pointer;">
+          Enable background auto-scheduler on this server
+        </label>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+        <button class="btn" id="settings-reset-btn" type="button" style="background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); font-size: 0.8rem; padding: 8px 14px;" title="Reset all 30 days to unchecked">
+          🔄 Reset All Tasks
+        </button>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-secondary" id="settings-cancel-btn">Cancel</button>
+          <button class="btn" id="settings-save-btn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toast-container"></div>
+
+  <script>
+    // Master 30-Day Python Roadmap Curriculum
+    const DEFAULT_ROADMAP_DATA = [
+      {
+        week: "Week 1: Python Foundation",
+        badge: "Week 1",
+        desc: "Master Python syntax, data structures, and fundamental control flow (Days 1–7)",
+        days: [
+          {
+            day: 1,
+            title: "Setup + Basics",
+            topics: ["Python installation & VS Code setup", "print() function & comments", "Syntax rules & execution flow"],
+            code: '# Day 1: First Python Program\nname = "Python Explorer"\nprint(f"Hello, {name}! Welcome to Day 1.")'
+          },
+          {
+            day: 2,
+            title: "Variables & Data Types",
+            topics: ["int, float, str, bool primitives", "Type casting & conversion", "type() and isinstance() functions"],
+            code: '# Day 2: Dynamic Typing\nage = 22\ngpa = 3.85\nis_active = True\nprint(type(age), type(gpa), type(is_active))'
+          },
+          {
+            day: 3,
+            title: "Operators",
+            topics: ["Arithmetic (+, -, *, /, //, %, **)", "Comparison (==, !=, >, <)", "Logical (and, or, not) & Bitwise"],
+            code: '# Day 3: Logical & Math\nx, y = 15, 4\nprint(f"Div: {x/y}, Floor: {x//y}, Mod: {x%y}, Exp: {x**2}")\nprint(x > 10 and y < 5)'
+          },
+          {
+            day: 4,
+            title: "Strings & Methods",
+            topics: ["Indexing & negative slicing [start:stop:step]", "String methods (strip, split, join, replace)", "f-strings & string formatting"],
+            code: '# Day 4: Slicing & Formatting\ntext = "  python mastery  "\nclean = text.strip().title()\nprint(f"{clean} -> First 6 chars: {clean[:6]}")'
+          },
+          {
+            day: 5,
+            title: "Lists & Operations",
+            topics: ["Creating, indexing & slicing lists", "append, extend, insert, pop, remove", "sort vs sorted & list concatenation"],
+            code: '# Day 5: Dynamic Lists\nskills = ["Python", "SQL", "Git"]\nskills.append("FastAPI")\nprint(f"Top skill: {skills[0]}, Total: {len(skills)}")'
+          },
+          {
+            day: 6,
+            title: "Tuples, Sets & Dictionaries",
+            topics: ["Tuples (immutability, packing/unpacking)", "Sets (uniqueness, union, intersection)", "Dictionaries (key-value, .get(), .items())"],
+            code: '# Day 6: Hash Maps & Sets\nuser = {"name": "Alex", "level": "Intermediate"}\nunique_tags = {"backend", "python", "backend"}\nprint(user.get("role", "Developer"), unique_tags)'
+          },
+          {
+            day: 7,
+            title: "Conditionals & Logic",
+            topics: ["if, elif, else branch execution", "Nested conditions & ternary operators", "Truthiness (None, 0, empty collections)"],
+            code: '# Day 7: Decision Making\nscore = 88\ngrade = "A" if score >= 90 else ("B" if score >= 80 else "C")\nprint(f"Score {score} -> Grade {grade}")'
+          }
+        ]
+      },
+      {
+        week: "Week 2: Problem Solving & Logic",
+        badge: "Week 2",
+        desc: "Build algorithmic logic using loops, functions, and comprehensions (Days 8–12)",
+        days: [
+          {
+            day: 8,
+            title: "Loops (for & while)",
+            topics: ["for loops with range() & enumerate()", "while loops & condition testing", "break, continue, and else clauses"],
+            code: '# Day 8: Iteration with Enumerate\ntasks = ["Design", "Code", "Test"]\nfor idx, task in enumerate(tasks, start=1):\n    print(f"Step {idx}: {task}")'
+          },
+          {
+            day: 9,
+            title: "Loop Problem Solving",
+            topics: ["Pattern printing & pyramids", "Prime numbers check & sieve", "Factorial & Fibonacci sequences"],
+            code: '# Day 9: Fibonacci Generator\na, b = 0, 1\nfib = []\nfor _ in range(8):\n    fib.append(a)\n    a, b = b, a + b\nprint("Fibonacci:", fib)'
+          },
+          {
+            day: 10,
+            title: "Functions & Modularity",
+            topics: ["def syntax, parameters & return values", "Default arguments & keyword arguments", "Docstrings & pure functions"],
+            code: '# Day 10: Clean Functions\ndef calculate_roi(investment: float, returns: float) -> float:\n    """Calculates ROI percentage."""\n    return ((returns - investment) / investment) * 100\nprint(f"ROI: {calculate_roi(1000, 1450):.1f}%")'
+          },
+          {
+            day: 11,
+            title: "Advanced Functions & Scope",
+            topics: ["*args (variable positional) & **kwargs", "Anonymous lambda functions", "Variable scope (LEGB rule & global/nonlocal)"],
+            code: '# Day 11: Args & Kwargs\ndef build_profile(username, *skills, **details):\n    return {"user": username, "skills": list(skills), **details}\nprint(build_profile("alex", "Python", "SQL", city="Tokyo"))'
+          },
+          {
+            day: 12,
+            title: "Comprehensions",
+            topics: ["List comprehensions with if-else filtering", "Dictionary comprehensions", "Set & Generator expressions"],
+            code: '# Day 12: Pythonic Comprehensions\nnumbers = range(1, 11)\nev_squares = {x: x**2 for x in numbers if x % 2 == 0}\nprint("Even Squares Dict:", ev_squares)'
+          }
+        ]
+      },
+      {
+        week: "Week 3: Intermediate Python",
+        badge: "Week 3",
+        desc: "Explore file handling, exceptions, functional patterns, and generators (Days 13–18)",
+        days: [
+          {
+            day: 13,
+            title: "Modules & Packages",
+            topics: ["importing built-in modules (math, os, sys)", "from module import function syntax", "__name__ == '__main__' convention"],
+            code: '# Day 13: Modular Architecture\nimport math\nfrom datetime import datetime\nprint(f"Pi: {math.pi:.4f} | Timestamp: {datetime.now().strftime(\'%H:%M:%S\')}")'
+          },
+          {
+            day: 14,
+            title: "Exception Handling",
+            topics: ["try, except blocks & catching specific errors", "else block (runs when no error occurs)", "finally block & custom raise exceptions"],
+            code: '# Day 14: Robust Error Handling\ntry:\n    val = int("42")\n    res = 100 / val\nexcept (ValueError, ZeroDivisionError) as err:\n    print(f"Caught: {err}")\nelse:\n    print(f"Success: {res}")\nfinally:\n    print("Cleanup completed.")'
+          },
+          {
+            day: 15,
+            title: "File Handling (I/O)",
+            topics: ["Reading & writing text files with context managers", "Parsing and dumping JSON data", "Reading & writing CSV files safely"],
+            code: '# Day 15: Safe File Context Manager\nimport json\ndata = {"goal": "Python Mastery", "status": "In Progress"}\nwith open("progress.json", "w") as f:\n    json.dump(data, f, indent=2)\nprint("JSON file persisted.")'
+          },
+          {
+            day: 16,
+            title: "Functional Programming",
+            topics: ["map() for element transformations", "filter() for predicate filtering", "functools.reduce() for aggregate reductions"],
+            code: '# Day 16: Functional Map & Filter\nprices = [12.5, 45.0, 9.99, 120.0]\nbudget_items = list(filter(lambda p: p < 50.0, prices))\ntaxed = list(map(lambda p: round(p * 1.1, 2), budget_items))\nprint("Taxed Budget Items:", taxed)'
+          },
+          {
+            day: 17,
+            title: "Iterators & Generators",
+            topics: ["Iterable vs Iterator protocols (iter(), next())", "Generator functions with yield", "Memory efficiency in large data streams"],
+            code: '# Day 17: Infinite/Stream Generator\ndef count_up(start=1):\n    num = start\n    while True:\n        yield num\n        num += 1\ngen = count_up(10)\nprint([next(gen), next(gen), next(gen)])'
+          },
+          {
+            day: 18,
+            title: "Decorators",
+            topics: ["Higher-order functions & closures", "Writing basic decorators with @syntax", "functools.wraps & timing decorator"],
+            code: '# Day 18: Function Execution Timer Decorator\nimport time\nfrom functools import wraps\ndef timer(func):\n    @wraps(func)\n    def wrapper(*a, **kw):\n        t0 = time.perf_counter()\n        res = func(*a, **kw)\n        print(f"{func.__name__} took {(time.perf_counter()-t0)*1000:.2f}ms")\n        return res\n    return wrapper'
+          }
+        ]
+      },
+      {
+        week: "Week 4: OOP & Real-World Engineering",
+        badge: "Week 4",
+        desc: "Master object-oriented programming, REST APIs, databases, and concurrency (Days 19–27)",
+        days: [
+          {
+            day: 19,
+            title: "OOP Fundamentals",
+            topics: ["Classes, objects & instances", "__init__ constructor & self keyword", "Instance attributes & instance methods"],
+            code: '# Day 19: Classes & Methods\nclass Developer:\n    def __init__(self, name: str, language: str):\n        self.name = name\n        self.language = language\n    def introduce(self):\n        return f"Hi, I\'m {self.name}, writing {self.language}!"\ndev = Developer("Alex", "Python")\nprint(dev.introduce())'
+          },
+          {
+            day: 20,
+            title: "OOP Advanced Pillars",
+            topics: ["Inheritance & super() calls", "Polymorphism & method overriding", "Encapsulation (private/protected attributes)"],
+            code: '# Day 20: Inheritance & Polymorphism\nclass TechLead(Developer):\n    def __init__(self, name: str, team_size: int):\n        super().__init__(name, "Python Architecture")\n        self.team_size = team_size\nlead = TechLead("Sara", 5)\nprint(lead.introduce(), f"Managing {lead.team_size} devs.")'
+          },
+          {
+            day: 21,
+            title: "Mini Project: Student CRUD App",
+            topics: ["Designing a domain model class", "CRUD operations (Create, Read, Update, Delete)", "Console menu interface & state management"],
+            code: '# Day 21: In-Memory CRUD Model\nclass StudentDB:\n    def __init__(self):\n        self.records = {}\n    def add(self, sid, name):\n        self.records[sid] = name\n    def get(self, sid):\n        return self.records.get(sid, "Not found")\ndb = StudentDB()\ndb.add(101, "Alex")\nprint("Lookup 101:", db.get(101))'
+          },
+          {
+            day: 22,
+            title: "APIs & HTTP Requests",
+            topics: ["HTTP protocol (GET, POST, headers, status codes)", "Using the requests library", "Parsing JSON responses & handling error codes"],
+            code: '# Day 22: Consuming REST APIs\nimport requests\ntry:\n    resp = requests.get("https://api.github.com", timeout=5)\n    print("GitHub API Status:", resp.status_code)\nexcept Exception as err:\n    print("Network error:", err)'
+          },
+          {
+            day: 23,
+            title: "Web Scraping",
+            topics: ["BeautifulSoup4 setup & HTML parsing", "Selecting tags via find() & select() CSS queries", "Extracting attributes, text & handling pagination"],
+            code: '# Day 23: HTML Extraction with BeautifulSoup\nfrom bs4 import BeautifulSoup\nhtml = "<div class=\'course\'><h1>Python 30</h1></div>"\nsoup = BeautifulSoup(html, "html.parser")\nprint("Title:", soup.find("h1").text)'
+          },
+          {
+            day: 24,
+            title: "Python + SQLite Database",
+            topics: ["sqlite3 standard library connection", "Executing CREATE TABLE, INSERT, SELECT queries", "Parameterized queries preventing SQL injection"],
+            code: '# Day 24: Embedded SQL Database\nimport sqlite3\nconn = sqlite3.connect(":memory:")\ncur = conn.cursor()\ncur.execute("CREATE TABLE goals (id INT, name TEXT)")\ncur.execute("INSERT INTO goals VALUES (1, \'Master Python\')")\nprint("Queried:", cur.execute("SELECT * FROM goals").fetchall())\nconn.close()'
+          },
+          {
+            day: 25,
+            title: "Modern Python Features",
+            topics: ["Type hinting (typing module, Optional, Union)", "@dataclass decorator for clean data structures", "Custom context managers with contextlib"],
+            code: '# Day 25: Dataclasses & Types\nfrom dataclasses import dataclass\n@dataclass\nclass CourseDay:\n    day_num: int\n    title: str\n    completed: bool = False\ntoday = CourseDay(25, "Modern Python")\nprint(today)'
+          },
+          {
+            day: 26,
+            title: "Testing & Debugging",
+            topics: ["Writing tests with pytest or unittest", "Assertions & test discovery", "logging module (DEBUG, INFO, ERROR)"],
+            code: '# Day 26: Test Driven Verification\ndef add(a, b): return a + b\ndef test_add():\n    assert add(2, 3) == 5\n    assert add(-1, 1) == 0\ntest_add()\nprint("All test assertions passed successfully!")'
+          },
+          {
+            day: 27,
+            title: "Concurrency & Asyncio",
+            topics: ["Threading for I/O bound tasks", "Multiprocessing for CPU bound tasks", "async def & await event loop fundamentals"],
+            code: '# Day 27: Async/Await Concurrency\nimport asyncio\nasync def fetch_task(name, delay):\n    await asyncio.sleep(delay)\n    return f"Done: {name}"\nasync def main():\n    res = await asyncio.gather(fetch_task("A", 0.1), fetch_task("B", 0.1))\n    print(res)\nasyncio.run(main())'
+          }
+        ]
+      },
+      {
+        week: "Week 5: Data Analytics & Capstone",
+        badge: "Week 5",
+        desc: "Analyze data with NumPy & Pandas and build your end-to-end portfolio capstone (Days 28–30)",
+        days: [
+          {
+            day: 28,
+            title: "NumPy & Pandas Essentials",
+            topics: ["NumPy ndarrays & vectorized arithmetic", "Pandas DataFrames & Series creation", "Filtering rows, groupby aggregations & sorting"],
+            code: '# Day 28: DataFrames & Analytics\n# import pandas as pd\n# df = pd.DataFrame({"day": [1, 2, 3], "hours": [1.0, 1.2, 1.5]})\n# print("Mean study hours:", df["hours"].mean())\nprint("NumPy & Pandas ready for data transformations.")'
+          },
+          {
+            day: 29,
+            title: "Data Visualization & EDA",
+            topics: ["Matplotlib line, bar, and scatter charts", "Seaborn statistical plots & color palettes", "Exploratory data analysis & formatting insights"],
+            code: '# Day 29: Plotting Pipeline\n# import matplotlib.pyplot as plt\n# plt.plot([1, 2, 3], [10, 25, 40], marker="o")\n# plt.title("Learning Momentum")\n# plt.show()\nprint("Charts and Visual analytics pipeline prepared.")'
+          },
+          {
+            day: 30,
+            title: "Capstone: Sales Analytics Pipeline",
+            topics: ["End-to-end pipeline: Raw CSV -> Clean -> SQLite", "Generate summary statistics & KPI metrics", "Automated executive summary report & presentation"],
+            code: '# Day 30: Capstone Project Architecture\nprint("🎉 Congratulations! Python 30-Day Mastery Achieved.")\nprint("Portfolio Capstone: End-to-End Analytics Pipeline Built.")'
+          }
+        ]
+      }
+    ];
+
+    // State
+    let isServerMode = false;
+    let appConfig = {
+      ntfy_topic: "python-tracker",
+      start_date: "2026-10-20",
+      reminder_time: "09:00",
+      auto_remind: true,
+      completed_days: []
+    };
+    let roadmapData = DEFAULT_ROADMAP_DATA;
+    let activeDayNumber = 1;
+    let activeFilter = "all";
+
+    // Toast helper
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(50px)";
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Connect to Backend API or initialize Cloud Static Mode
+    async function initApp() {
+      // 1. Immediately load local storage & defaults so UI renders without delay
+      loadLocalState();
+      renderAll();
+
+      // 2. Try to connect to local Python server if running on machine
+      try {
+        const statusRes = await fetch("/api/status");
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          appConfig = statusData.config;
+
+          const localReset = parseInt(localStorage.getItem("python_tracker_last_reset") || "0", 10);
+          const serverReset = statusData.config.last_reset || 0;
+          if (localReset > serverReset) {
+            appConfig.completed_days = [];
+            fetch("/api/progress", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ completed_days: [], last_reset: localReset })
+            }).catch(() => {});
+          } else if (serverReset > localReset) {
+            localStorage.setItem("python_tracker_last_reset", String(serverReset));
+          }
+
+          isServerMode = true;
+          setServerStatus(true, `Local Server Connected • Scheduler ${appConfig.auto_remind ? 'Active' : 'Paused'}`);
+          renderAll();
+          return;
+        }
+      } catch (err) {
+        // Expected when hosted on Vercel
+      }
+
+      // 3. Cloud / Standalone Mode (Vercel)
+      isServerMode = false;
+      setServerStatus(true, "Cloud Dashboard • GitHub Actions 9:00 AM Alert Active");
+      renderAll();
+    }
+
+    function setServerStatus(connected, text) {
+      const dot = document.getElementById("server-dot");
+      const txt = document.getElementById("server-status-text");
+      txt.textContent = text;
+      dot.style.backgroundColor = connected ? "var(--success)" : "var(--py-yellow)";
+      dot.style.boxShadow = connected ? "0 0 10px var(--success)" : "0 0 10px var(--py-yellow)";
+    }
+
+    // Render Everything
+    function renderAll() {
+      // Update Topic Link
+      const topicLink = document.getElementById("topic-link");
+      topicLink.textContent = appConfig.ntfy_topic;
+      topicLink.href = `https://ntfy.sh/${appConfig.ntfy_topic}`;
+
+      // Calculate Day info
+      const today = new Date();
+      const start = new Date(appConfig.start_date + "T00:00:00");
+      const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1;
+      activeDayNumber = Math.max(1, Math.min(30, diffDays));
+
+      // Update Header Stats
+      const completed = appConfig.completed_days || [];
+      const totalCount = completed.length;
+      const pct = Math.round((totalCount / 30) * 100);
+
+      document.getElementById("progress-val").textContent = `${pct}%`;
+      document.getElementById("progress-bar-fill").style.width = `${pct}%`;
+      document.getElementById("stat-completed-count").textContent = `${totalCount} / 30`;
+      document.getElementById("stat-remaining-count").textContent = `${30 - totalCount} days remaining`;
+
+      document.getElementById("stat-today-badge").textContent = diffDays >= 1 && diffDays <= 30 ? `Day ${diffDays}` : (diffDays > 30 ? "Finished" : `In ${Math.abs(diffDays - 1)}d`);
+      
+      const currentDayItem = findDay(activeDayNumber);
+      if (currentDayItem) {
+        document.getElementById("stat-today-title").textContent = currentDayItem.title;
+      }
+
+      // Update Alert Time badge
+      const timeVal = appConfig.reminder_time || "09:00";
+      try {
+        const [th, tm] = timeVal.split(":").map(Number);
+        const ampm = th >= 12 ? "PM" : "AM";
+        const formattedH = (th % 12 || 12).toString().padStart(2, "0");
+        document.getElementById("alert-time-display").textContent = `${formattedH}:${tm.toString().padStart(2, "0")} ${ampm}`;
+      } catch (e) {
+        document.getElementById("alert-time-display").textContent = timeVal;
+      }
+
+      renderRoadmapGrid();
+    }
+
+    function scheduleNextCloudAlert(timeStr) {
+      if (!timeStr) return;
+      try {
+        const [hh, mm] = timeStr.split(":").map(Number);
+        const now = new Date();
+        const target = new Date();
+        target.setHours(hh, mm, 0, 0);
+        
+        if (target <= now) {
+          target.setDate(target.getDate() + 1);
+        }
+        
+        const targetEpoch = Math.floor(target.getTime() / 1000);
+        const diffDays = Math.floor((target - new Date(appConfig.start_date + "T00:00:00")) / (1000 * 60 * 60 * 24)) + 1;
+        const dayNum = Math.max(1, Math.min(30, diffDays));
+        const item = findDay(dayNum) || { title: "Python Study Session", topics: ["Core Concepts", "Coding Practice"] };
+
+        const headline = `Python Roadmap - Day ${dayNum}: ${item.title}`;
+        const message = `Topic: ${item.title}\nKey Concepts: ${item.topics.join(", ")}\n\n1-Hour Protocol:\n- 15m: Learn Concept\n- 25m: Code Yourself\n- 15m: Practice Problems\n- 5m: Notes & Review\n\nConsistency beats talent. Let's get it done today!`;
+
+        fetch("https://ntfy.sh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic: appConfig.ntfy_topic,
+            title: headline,
+            message: message,
+            priority: 4,
+            tags: ["snake", "books"],
+            delay: String(targetEpoch),
+            actions: [
+              {
+                action: "http",
+                label: `Mark Day ${dayNum} Done`,
+                url: `https://ntfy.sh/${appConfig.ntfy_topic}`,
+                method: "POST",
+                body: `DONE ${dayNum}`
+              }
+            ]
+          })
+        }).catch(() => {});
+      } catch (e) {}
+    }
+
+    function findDay(dayNum) {
+      for (const m of roadmapData) {
+        for (const d of m.days) {
+          if (d.day === dayNum) return d;
+        }
+      }
+      return null;
+    }
+
+    function renderRoadmapGrid() {
+      const container = document.getElementById("roadmap-container");
+      container.innerHTML = "";
+      const completed = appConfig.completed_days || [];
+      let totalVisible = 0;
+
+      roadmapData.forEach(module => {
+        let matchingDays = module.days;
+        if (activeFilter === "today") {
+          matchingDays = matchingDays.filter(d => d.day === activeDayNumber);
+        } else if (activeFilter === "completed") {
+          matchingDays = matchingDays.filter(d => completed.includes(d.day));
+        } else if (activeFilter === "pending") {
+          matchingDays = matchingDays.filter(d => !completed.includes(d.day));
+        }
+
+        if (matchingDays.length === 0) return;
+        totalVisible += matchingDays.length;
+
+        const sec = document.createElement("section");
+        sec.className = "module-group";
+        sec.innerHTML = `
+          <div class="module-header">
+            <span class="module-tag">${module.badge}</span>
+            <div>
+              <div class="module-title">${module.week}</div>
+              <div class="module-subtitle">${module.desc}</div>
+            </div>
+          </div>
+          <div class="cards-grid"></div>
+        `;
+
+        const grid = sec.querySelector(".cards-grid");
+        matchingDays.forEach(item => {
+          const isDone = completed.includes(item.day);
+          const isToday = item.day === activeDayNumber;
+          const card = document.createElement("div");
+          card.className = `day-card ${isDone ? "completed" : ""} ${isToday ? "today-highlight" : ""}`;
+          
+          card.innerHTML = `
+            <div>
+              <div class="day-top">
+                <span class="day-pill">Day ${item.day}</span>
+                <label class="check-btn">
+                  <input type="checkbox" ${isDone ? "checked" : ""} data-day="${item.day}" />
+                  <span>${isDone ? "Completed" : "Mark done"}</span>
+                </label>
+              </div>
+              <div class="card-title">${item.title}</div>
+              <ul class="topic-list">
+                ${item.topics.map(t => `<li>${escapeHtml(t)}</li>`).join("")}
+              </ul>
+            </div>
+
+            <div class="code-box">
+              <button class="copy-btn" title="Copy snippet to clipboard">Copy</button>
+              <pre><code>${escapeHtml(item.code)}</code></pre>
+            </div>
+          `;
+
+          // Checkbox toggle
+          const chk = card.querySelector("input[type='checkbox']");
+          chk.addEventListener("change", () => toggleDayProgress(item.day));
+
+          // Copy code
+          const copyBtn = card.querySelector(".copy-btn");
+          copyBtn.addEventListener("click", () => {
+            navigator.clipboard.writeText(item.code);
+            copyBtn.textContent = "Copied!";
+            setTimeout(() => copyBtn.textContent = "Copy", 1800);
+          });
+
+          grid.appendChild(card);
+        });
+
+        container.appendChild(sec);
+      });
+
+      document.getElementById("filter-count-label").textContent = `Showing ${totalVisible} of 30 days`;
+    }
+
+    async function toggleDayProgress(dayNum) {
+      const completed = appConfig.completed_days || [];
+      const isAlready = completed.includes(dayNum);
+      const nextCompleted = isAlready ? completed.filter(d => d !== dayNum) : [...completed, dayNum];
+      appConfig.completed_days = nextCompleted;
+
+      // Track manual unchecks with timestamp so historical ntfy poll doesn't re-check it
+      if (isAlready) {
+        try {
+          const unchecks = JSON.parse(localStorage.getItem("python_tracker_unchecks") || "{}");
+          unchecks[dayNum] = Math.floor(Date.now() / 1000);
+          localStorage.setItem("python_tracker_unchecks", JSON.stringify(unchecks));
+        } catch (e) {}
+      }
+
+      // Always save to localStorage so progress persists on Vercel
+      localStorage.setItem("python_tracker_completed_days", JSON.stringify(appConfig.completed_days));
+      try {
+        const savedCfg = JSON.parse(localStorage.getItem("python_tracker_config") || "{}");
+        savedCfg.completed_days = appConfig.completed_days;
+        localStorage.setItem("python_tracker_config", JSON.stringify(savedCfg));
+      } catch (e) {}
+
+      if (isServerMode) {
+        try {
+          const resp = await fetch("/api/progress", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ day: dayNum, toggle: true })
+          });
+          const res = await resp.json();
+          if (res.success) {
+            appConfig.completed_days = res.completed_days;
+            localStorage.setItem("python_tracker_completed_days", JSON.stringify(appConfig.completed_days));
+          }
+        } catch (e) {
+          console.error("Progress save failed:", e);
+        }
+      }
+
+      showToast(`Day ${dayNum} marked as ${!isAlready ? 'Completed! 🎉' : 'Pending.'}`, !isAlready ? "success" : "info");
+      renderAll();
+    }
+
+    // Manual Push Trigger: sends push notification directly to phone
+    document.getElementById("btn-trigger-push").addEventListener("click", async () => {
+      const btn = document.getElementById("btn-trigger-push");
+      btn.disabled = true;
+      btn.textContent = "Sending...";
+
+      let sent = false;
+
+      // Try via local backend server if active
+      if (isServerMode) {
+        try {
+          const resp = await fetch("/api/send-alert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ day: activeDayNumber })
+          });
+          const result = await resp.json();
+          if (result.success) {
+            showToast(`✅ Push notification sent to topic: ${result.topic}`, "success");
+            sent = true;
+          }
+        } catch (err) {
+          console.warn("Backend send failed, falling back to direct browser push:", err);
+        }
+      }
+
+      // If on Vercel or local backend not reachable, push directly from browser to ntfy.sh
+      if (!sent) {
+        try {
+          const item = findDay(activeDayNumber) || { title: "Python Study Session", topics: ["Core Concepts", "Coding Practice"] };
+          const headline = `Python Roadmap - Day ${activeDayNumber}: ${item.title}`;
+          const message = `Topic: ${item.title}\nKey Concepts: ${item.topics.join(", ")}\n\n1-Hour Protocol:\n- 15m: Learn Concept\n- 25m: Code Yourself\n- 15m: Practice Problems\n- 5m: Notes & Review\n\nConsistency beats talent. Let's get it done today!`;
+
+          const resp = await fetch("https://ntfy.sh", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              topic: appConfig.ntfy_topic,
+              title: headline,
+              message: message,
+              priority: 4,
+              tags: ["snake", "books"],
+              actions: [
+                {
+                  action: "http",
+                  label: `Mark Day ${activeDayNumber} Done`,
+                  url: `https://ntfy.sh/${appConfig.ntfy_topic}`,
+                  method: "POST",
+                  body: `DONE ${activeDayNumber}`
+                }
+              ]
+            })
+          });
+
+          if (resp.ok) {
+            showToast(`✅ Alert pushed to phone topic '${appConfig.ntfy_topic}'!`, "success");
+          } else {
+            showToast(`❌ Push error: HTTP ${resp.status}`, "error");
+          }
+        } catch (err) {
+          showToast(`❌ Connection error: ${err.message}`, "error");
+        }
+      }
+
+      btn.disabled = false;
+      btn.textContent = "⚡ Send Push to Phone";
+    });
+
+    // Filter Buttons
+    document.querySelectorAll(".filter-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        activeFilter = tab.getAttribute("data-filter");
+        renderRoadmapGrid();
+      });
+    });
+
+    // Settings Modal Handlers
+    const settingsModal = document.getElementById("settings-modal");
+    document.getElementById("btn-open-settings").addEventListener("click", () => {
+      document.getElementById("input-topic").value = appConfig.ntfy_topic || "";
+      document.getElementById("input-start-date").value = appConfig.start_date || "2026-10-20";
+      document.getElementById("input-reminder-time").value = appConfig.reminder_time || "09:00";
+      document.getElementById("input-auto-remind").checked = appConfig.auto_remind !== false;
+      settingsModal.style.display = "flex";
+    });
+
+    document.getElementById("settings-cancel-btn").addEventListener("click", () => {
+      settingsModal.style.display = "none";
+    });
+
+    document.getElementById("settings-save-btn").addEventListener("click", async () => {
+      const topic = document.getElementById("input-topic").value.trim() || "python-tracker";
+      const startDate = document.getElementById("input-start-date").value || "2026-10-20";
+      const reminderTime = document.getElementById("input-reminder-time").value || "09:00";
+      const autoRemind = document.getElementById("input-auto-remind").checked;
+
+      appConfig.ntfy_topic = topic;
+      appConfig.start_date = startDate;
+      appConfig.reminder_time = reminderTime;
+      appConfig.auto_remind = autoRemind;
+
+      // Always save to localStorage immediately so it persists across reloads
+      localStorage.setItem("python_tracker_config", JSON.stringify(appConfig));
+
+      // Save to local Python server if connected
+      if (isServerMode) {
+        try {
+          await fetch("/api/settings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ntfy_topic: topic,
+              start_date: startDate,
+              reminder_time: reminderTime,
+              auto_remind: autoRemind
+            })
+          });
+        } catch (e) {
+          console.error("Failed to save settings to server:", e);
+        }
+      }
+
+      // Broadcast settings to all other open devices & tabs via ntfy cloud topic
+      try {
+        fetch("https://ntfy.sh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic: topic,
+            title: "CONFIG_SYNC",
+            message: `SYNC_SETTINGS:${JSON.stringify({
+              reminder_time: reminderTime,
+              start_date: startDate,
+              auto_remind: autoRemind,
+              updated_at: Date.now()
+            })}`,
+            priority: 1, // Minimum priority - silent background sync
+            tags: ["gear"]
+          })
+        }).catch(() => {});
+      } catch (e) {}
+
+      settingsModal.style.display = "none";
+      showToast(`Settings saved! Next alert scheduled for ${reminderTime}.`, "success");
+      renderAll();
+      startPhoneEventListener();
+      scheduleNextCloudAlert(reminderTime);
+    });
+
+    document.getElementById("alert-time-badge").addEventListener("click", () => {
+      document.getElementById("btn-open-settings").click();
+    });
+
+    // Reset Progress Handler
+    document.getElementById("settings-reset-btn").addEventListener("click", async () => {
+      const confirmed = confirm("Are you sure you want to reset your progress? All completed tasks will be unchecked back to 0%.");
+      if (!confirmed) return;
+
+      const nowEpoch = Math.floor(Date.now() / 1000);
+      localStorage.setItem("python_tracker_last_reset", String(nowEpoch));
+      localStorage.setItem("python_tracker_unchecks", "{}");
+      localStorage.setItem("python_tracker_processed_ids", "[]");
+      appConfig.completed_days = [];
+      localStorage.setItem("python_tracker_completed_days", JSON.stringify([]));
+
+      try {
+        const savedCfg = JSON.parse(localStorage.getItem("python_tracker_config") || "{}");
+        savedCfg.completed_days = [];
+        localStorage.setItem("python_tracker_config", JSON.stringify(savedCfg));
+      } catch (e) {}
+
+      // Broadcast reset event to other devices & tabs via ntfy cloud topic
+      try {
+        fetch("https://ntfy.sh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic: appConfig.ntfy_topic,
+            title: "CONFIG_SYNC",
+            message: `SYNC_RESET:${JSON.stringify({
+              last_reset: nowEpoch
+            })}`,
+            priority: 1, // Minimum priority - silent background sync
+            tags: ["recycle"]
+          })
+        }).catch(() => {});
+      } catch (e) {}
+
+      // Also reset on local server if active
+      if (isServerMode) {
+        try {
+          await fetch("/api/progress", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ completed_days: [], last_reset: nowEpoch })
+          });
+        } catch (e) {
+          console.error("Local server reset failed:", e);
+        }
+      }
+
+      settingsModal.style.display = "none";
+      showToast("🔄 All tasks have been reset to unchecked (0%).", "info");
+      renderAll();
+    });
+
+    // 1-Hour Phase Timer Logic
+    const timerPhases = [
+      { name: "Phase 1: Learn Concept", duration: 15 * 60, tip: "Understand syntax, documentation, and mental models without getting distracted." },
+      { name: "Phase 2: Code Yourself", duration: 25 * 60, tip: "Open VS Code and write the examples from scratch. Do not just copy-paste!" },
+      { name: "Phase 3: Solve Problems", duration: 15 * 60, tip: "Tackle 2-3 practice problems, edge cases, or test different inputs." },
+      { name: "Phase 4: Notes & Review", duration: 5 * 60, tip: "Summarize what you learned in 3 bullets, save notes, and commit code." }
+    ];
+
+    let currentPhaseIdx = 0;
+    let timerSecLeft = timerPhases[0].duration;
+    let timerInterval = null;
+
+    const timerModal = document.getElementById("timer-modal");
+    const timerPlayBtn = document.getElementById("timer-play-btn");
+    const timerDisplay = document.getElementById("timer-display");
+    const timerPhaseBadge = document.getElementById("timer-phase-badge");
+    const timerTip = document.getElementById("timer-tip");
+
+    document.getElementById("btn-open-timer").addEventListener("click", () => {
+      timerModal.style.display = "flex";
+      updateTimerUI();
+    });
+    document.getElementById("timer-close-btn").addEventListener("click", () => {
+      timerModal.style.display = "none";
+    });
+
+    function updateTimerUI() {
+      const mins = String(Math.floor(timerSecLeft / 60)).padStart(2, "0");
+      const secs = String(timerSecLeft % 60).padStart(2, "0");
+      timerDisplay.textContent = `${mins}:${secs}`;
+      timerPhaseBadge.textContent = timerPhases[currentPhaseIdx].name;
+      timerTip.textContent = timerPhases[currentPhaseIdx].tip;
+    }
+
+    timerPlayBtn.addEventListener("click", () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerPlayBtn.textContent = "Resume";
+      } else {
+        timerPlayBtn.textContent = "Pause";
+        timerInterval = setInterval(() => {
+          if (timerSecLeft > 0) {
+            timerSecLeft--;
+            updateTimerUI();
+          } else {
+            if (currentPhaseIdx < timerPhases.length - 1) {
+              currentPhaseIdx++;
+              timerSecLeft = timerPhases[currentPhaseIdx].duration;
+              showToast(`🔔 Phase finished! Moving to: ${timerPhases[currentPhaseIdx].name}`, "info");
+              updateTimerUI();
+            } else {
+              clearInterval(timerInterval);
+              timerInterval = null;
+              timerPlayBtn.textContent = "Start";
+              showToast("🎉 Full 1-Hour study protocol completed! Excellent work.", "success");
+            }
+          }
+        }, 1000);
+      }
+    });
+
+    document.getElementById("timer-skip-btn").addEventListener("click", () => {
+      if (currentPhaseIdx < timerPhases.length - 1) {
+        currentPhaseIdx++;
+        timerSecLeft = timerPhases[currentPhaseIdx].duration;
+        updateTimerUI();
+      } else {
+        showToast("You are on the final phase!", "info");
+      }
+    });
+
+    document.getElementById("timer-reset-btn").addEventListener("click", () => {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      currentPhaseIdx = 0;
+      timerSecLeft = timerPhases[0].duration;
+      timerPlayBtn.textContent = "Start";
+      updateTimerUI();
+    });
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Fallback Local Storage loader
+    function loadLocalState() {
+      try {
+        const savedCfg = localStorage.getItem("python_tracker_config");
+        if (savedCfg) {
+          const parsed = JSON.parse(savedCfg);
+          appConfig = { ...appConfig, ...parsed };
+        }
+        const savedDays = localStorage.getItem("python_tracker_completed_days");
+        if (savedDays !== null) {
+          appConfig.completed_days = JSON.parse(savedDays);
+        }
+      } catch (e) {}
+    }
+
+    // Direct Real-time Phone Sync via ntfy.sh (Works 100% on Vercel and Everywhere)
+    let ntfyEventSource = null;
+
+    function startPhoneEventListener() {
+      const topic = appConfig.ntfy_topic || "python-tracker";
+      const lastReset = parseInt(localStorage.getItem("python_tracker_last_reset") || "0", 10);
+
+      // Only poll messages that were published AFTER last_reset.
+      // If no reset has been performed yet, only check recent messages within 1 hour.
+      const pollSince = lastReset > 0 ? String(lastReset) : "1h";
+
+      // 1. Check recent messages to catch any 'DONE' sent while the dashboard was closed
+      fetch(`https://ntfy.sh/${topic}/json?poll=1&since=${pollSince}`)
+        .then(r => r.text())
+        .then(text => {
+          text.split("\n").forEach(line => {
+            if (!line.trim()) return;
+            try {
+              const ev = JSON.parse(line);
+              processIncomingPhoneMessage(ev, false);
+            } catch (e) {}
+          });
+        })
+        .catch(err => console.warn("Could not poll ntfy history:", err));
+
+      // 2. Open real-time SSE stream for instant updates when phone sends 'DONE'
+      if (ntfyEventSource) {
+        try { ntfyEventSource.close(); } catch (e) {}
+      }
+
+      try {
+        ntfyEventSource = new EventSource(`https://ntfy.sh/${topic}/sse`);
+        ntfyEventSource.onmessage = (event) => {
+          try {
+            const ev = JSON.parse(event.data);
+            processIncomingPhoneMessage(ev, true);
+          } catch (e) {}
+        };
+        ntfyEventSource.onerror = () => {
+          // Auto-reconnect after 10s if connection drops
+          setTimeout(startPhoneEventListener, 10000);
+        };
+      } catch (err) {
+        console.warn("EventSource not supported:", err);
+      }
+    }
+
+    function processIncomingPhoneMessage(ev, notifyUser = true) {
+      if (!ev || ev.event !== "message") return;
+      const rawMsg = (ev.message || "").trim();
+      const title = ev.title || "";
+
+      // 1. Sync settings across multiple devices / browsers
+      if (title === "CONFIG_SYNC" || rawMsg.startsWith("SYNC_SETTINGS:")) {
+        if (rawMsg.startsWith("SYNC_RESET:")) {
+          try {
+            const payloadStr = rawMsg.replace("SYNC_RESET:", "").trim();
+            const synced = JSON.parse(payloadStr);
+            if (synced.last_reset) {
+              localStorage.setItem("python_tracker_last_reset", String(synced.last_reset));
+              localStorage.setItem("python_tracker_unchecks", "{}");
+              localStorage.setItem("python_tracker_processed_ids", "[]");
+              appConfig.completed_days = [];
+              localStorage.setItem("python_tracker_completed_days", JSON.stringify([]));
+              try {
+                const savedCfg = JSON.parse(localStorage.getItem("python_tracker_config") || "{}");
+                savedCfg.completed_days = [];
+                localStorage.setItem("python_tracker_config", JSON.stringify(savedCfg));
+              } catch (e) {}
+              renderAll();
+              if (notifyUser) {
+                showToast("🔄 Progress reset synced from another device (0%).", "info");
+              }
+            }
+          } catch (err) {}
+          return;
+        }
+
+        try {
+          const payloadStr = rawMsg.replace("SYNC_SETTINGS:", "").trim();
+          const synced = JSON.parse(payloadStr);
+          let changed = false;
+          if (synced.reminder_time && synced.reminder_time !== appConfig.reminder_time) {
+            appConfig.reminder_time = synced.reminder_time;
+            changed = true;
+          }
+          if (synced.start_date && synced.start_date !== appConfig.start_date) {
+            appConfig.start_date = synced.start_date;
+            changed = true;
+          }
+          if (synced.auto_remind !== undefined && synced.auto_remind !== appConfig.auto_remind) {
+            appConfig.auto_remind = synced.auto_remind;
+            changed = true;
+          }
+          if (changed) {
+            localStorage.setItem("python_tracker_config", JSON.stringify(appConfig));
+            renderAll();
+            scheduleNextCloudAlert(appConfig.reminder_time);
+            if (notifyUser) {
+              showToast(`⏰ Alert time synced from another device: ${document.getElementById("alert-time-display").textContent}`, "info");
+            }
+          }
+        } catch (err) {
+          console.warn("Failed to parse remote config sync:", err);
+        }
+        return;
+      }
+
+      // Ignore regular roadmap notifications generated by the app/bot
+      if (title.includes("Roadmap") || rawMsg.startsWith("Confirmed:") || title.includes("Completed!")) return;
+
+      // Deduplicate by message ID
+      let processedIds = [];
+      try {
+        processedIds = JSON.parse(localStorage.getItem("python_tracker_processed_ids") || "[]");
+      } catch (e) {}
+      if (ev.id && processedIds.includes(ev.id)) {
+        return;
+      }
+
+      // Ignore historical messages sent before the user clicked Reset
+      const lastReset = parseInt(localStorage.getItem("python_tracker_last_reset") || "0", 10);
+      if (ev.time && ev.time <= lastReset) {
+        return;
+      }
+
+      const clean = rawMsg.toUpperCase().replace(/[!.]/g, "").trim();
+      if (clean.startsWith("DONE") || clean.startsWith("COMPLETE") || clean === "FINISHED") {
+        let targetDay = activeDayNumber;
+        const match = clean.match(/\d+/);
+        if (match) targetDay = parseInt(match[0], 10);
+
+        // Check if day was manually unchecked after this message was sent
+        try {
+          const unchecks = JSON.parse(localStorage.getItem("python_tracker_unchecks") || "{}");
+          if (unchecks[targetDay] && ev.time && ev.time <= unchecks[targetDay]) {
+            return;
+          }
+        } catch (e) {}
+
+        // Mark message as processed
+        if (ev.id && !processedIds.includes(ev.id)) {
+          processedIds.push(ev.id);
+          if (processedIds.length > 50) processedIds.shift();
+          localStorage.setItem("python_tracker_processed_ids", JSON.stringify(processedIds));
+        }
+
+        const completed = appConfig.completed_days || [];
+        if (!completed.includes(targetDay)) {
+          appConfig.completed_days = [...completed, targetDay].sort((a, b) => a - b);
+          localStorage.setItem("python_tracker_completed_days", JSON.stringify(appConfig.completed_days));
+
+          if (notifyUser) {
+            showToast(`📱 Phone synced: Day ${targetDay} marked as COMPLETED! 🎉`, "success");
+          }
+          renderAll();
+
+          // Sync back to local server if running
+          if (isServerMode) {
+            fetch("/api/progress", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ day: targetDay, completed: true })
+            }).catch(() => {});
+          }
+        }
+      }
+    }
+
+    // Multi-Tab Real-time Sync (Instant synchronization between open tabs/windows in the same browser)
+    window.addEventListener("storage", (e) => {
+      if (e.key === "python_tracker_config" || e.key === "python_tracker_completed_days" || e.key === "python_tracker_last_reset") {
+        loadLocalState();
+        renderAll();
+      }
+    });
+
+    // Initialize
+    window.addEventListener("DOMContentLoaded", () => {
+      initApp();
+      startPhoneEventListener();
+
+      // Local Server sync loop (if local server is running)
+      setInterval(async () => {
+        if (!isServerMode) return;
+        try {
+          const resp = await fetch("/api/status");
+          if (resp.ok) {
+            const data = await resp.json();
+            const prevCompleted = (appConfig.completed_days || []).join(",");
+            const newCompleted = (data.config.completed_days || []).join(",");
+            const timeChanged = appConfig.reminder_time !== data.config.reminder_time;
+            const dateChanged = appConfig.start_date !== data.config.start_date;
+
+            if (prevCompleted !== newCompleted || timeChanged || dateChanged) {
+              appConfig = data.config;
+              localStorage.setItem("python_tracker_config", JSON.stringify(appConfig));
+              localStorage.setItem("python_tracker_completed_days", JSON.stringify(appConfig.completed_days));
+              if (timeChanged) {
+                showToast(`⏰ Alert time synced from server: ${data.config.reminder_time}`, "info");
+              } else if (prevCompleted !== newCompleted) {
+                showToast("💻 Server synced: Roadmap progress updated! 🎉", "success");
+              }
+              renderAll();
+            }
+          }
+        } catch (e) {}
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
