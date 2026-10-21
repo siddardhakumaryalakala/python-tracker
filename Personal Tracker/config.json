@@ -1,0 +1,9 @@
+{
+  "ntfy_topic": "python-tracker",
+  "start_date": "2026-10-20",
+  "reminder_time": "09:00",
+  "auto_remind": true,
+  "completed_days": [],
+  "last_notified_date": "",
+  "last_reset": 1792556700
+}
